@@ -12,7 +12,7 @@
 
 #ifndef __Interface_h
 #define __Interface_h
-#endif
+
 
 #define D3 0
 #define D4 2
@@ -33,3 +33,5 @@ class Board
     SocketIO socket;
     void checkIn();
 };
+
+#endif
