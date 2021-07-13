@@ -14,7 +14,8 @@
 
 Network network;
 SocketIO socket;
-Interface relay;
+Interface filler;
+Interface temp;
 
 #define D4 2
 #define D3 0
@@ -35,7 +36,9 @@ void setup()
 
     network.quickConnect("Eolio_2G", "7Chandrian");
 
-    relay.init(&socket, D4);
+    filler.init(&socket, D3, "Fill", "valve");
+    temp.init(&socket, D4, "Temp", "dht");
+
     socket.init("dani-test");
 }
 
@@ -45,15 +48,8 @@ void loop()
 {
     socket.loop();
     network.loop();
-
-    uint64_t now = millis();
-
-    if(now - messageTimestamp > 10000) {
-        messageTimestamp = now;
-
-        // Send event        
-        socket.quickSend("board:sense", "reading1", "2.99");
-    }
+    filler.loop();
+    temp.loop();
 }
 
 void initSerial()
