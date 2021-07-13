@@ -63,6 +63,7 @@ void Network::quickConnect(const std::string &ssid, const std::string &pass)
 
   Debug::printf("\nConnected:\t %s", WiFi.SSID().c_str());
   Debug::printf("\nIP Address:\t %s\n", WiFi.localIP().toString().c_str());
+  Debug::printf("\nMAC Address:\t %s\n", WiFi.macAddress().c_str());
 
   //Store quickConnect settings for future reference
   this->ssid = ssid;
