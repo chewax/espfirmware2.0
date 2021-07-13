@@ -10,6 +10,7 @@
 #include "Controller.h"
 #include "DHTController.h"
 #include "SwitchController.h"
+#include "ToggleController.h"
 
 #ifndef __Interface_h
 #define __Interface_h
@@ -41,8 +42,18 @@ void Interface::loop()
 
 void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
-  if (t_actuator == "dht") ifController = new DHTController();
-  else if (t_actuator == "valve") ifController = new SwitchController();
+  if (t_actuator == "dht") {
+    ifController = new DHTController();
+    ifController->init(t_socket, t_pin, t_name, t_actuator);
+  }
+  else if (t_actuator == "valve") {
+    ifController = new SwitchController();
+    ifController->init(t_socket, t_pin, t_name, t_actuator);
+  }
+  else if (t_actuator == "toggle") {
+    ifController = new ToggleController();
+    ((ToggleController*)ifController)->init(t_socket, t_pin, t_name, t_actuator, 2000);
+  }
   
-  ifController->init(t_socket, t_pin, t_name, t_actuator);
+  
 }
