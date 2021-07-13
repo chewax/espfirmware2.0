@@ -46,7 +46,7 @@ void DHTController::sense()
   payload["humidity"] = std::to_string(h).substr(0,4);
   payload["hic"] = std::to_string(hic).substr(0,4);
 
-  socket -> send("board:sense", payload);
+  socket -> send("board:data", payload);
 }
 
 void DHTController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
