@@ -8,6 +8,11 @@
 #include "src/Debug.h"
 #include "src/Network.h"
 #include "src/SocketIO.h"
+#include <map>
+#include <string>
+
+#define D3 0
+#define D4 2
 
 Network network;
 SocketIO socket;
@@ -16,21 +21,43 @@ SocketIO socket;
 void setup()
 {
     initSerial(); //Initialize serial so it can be used to print
-    
-    // network.onConnect([](){
-    //     Debug::printf("Connect Callback");
-    // });
+    pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(D4, OUTPUT);
 
-    // network.onDisconnect([](){
-    //     Debug::printf("Disconnect Callback");
-    // });
+    network.onConnect([](){
+        Debug::printf("Connect Callback\n");
+    });
+
+    network.onDisconnect([](){
+        Debug::printf("Disconnect Callback\n");
+    });
 
     network.quickConnect("Eolio_2G", "7Chandrian");
 
     socket.on("greetings", [](JsonObject data){
-        Debug::printf("onGreetings Callback\n");
+        Debug::printf("[SOCKETIO] onGreetings Callback\n");
+        serializeJson(data, Serial);
+    });
+
+    socket.on("board:on", [](JsonObject data){
+        digitalWrite(D4, HIGH);
+    });
+
+    socket.on("board:off", [](JsonObject data){
+        digitalWrite(D4, LOW);
+    });
+
+    socket.on("connect", [](JsonObject data){
+        Debug::printf("[SOCKETIO] onConnect Callback\n");
+        serializeJson(data, Serial);
+        checkIn();
     });
     
+    socket.on("error", [](JsonObject data){
+        Debug::printf("[SOCKETIO] onError Callback\n");
+        serializeJson(data, Serial);
+    });
+
     socket.init("dani-test");
 }
 
@@ -41,35 +68,43 @@ void loop()
     socket.loop();
     network.loop();
 
-    // if (millis() > now + 2000) {
-    //     now = millis();
-        
-    //     // creat JSON message for Socket.IO (event)
-    //     const size_t capacity = JSON_ARRAY_SIZE(2) + JSON_OBJECT_SIZE(3);
-    //     DynamicJsonDocument doc(capacity);
-
-    //     doc.add("sensor_reading"); //Add event name
-    //     JsonObject doc_1 = doc.createNestedObject();
-    //     doc_1["sender"] = "dani";
-    //     doc_1["reading1"] = "2,33";
-    //     doc_1["reading2"] = "off";
-
-    //     socket.emit(doc);
-    // } 
+    // digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    // digitalWrite(2, HIGH);   // turn the LED on (HIGH is the voltage level)
+    // delay(1000);                       // wait for a second
+    // digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    // digitalWrite(2, LOW);    // turn the LED off by making the voltage LOW
+    // delay(1000);    
 
     uint64_t now = millis();
 
-    if(now - messageTimestamp > 2000) {
+    if(now - messageTimestamp > 10000) {
         messageTimestamp = now;
 
         // Send event        
-        socket.quickSend("test-event", "reading1", "2.99");
+        socket.quickSend("board:sense", "reading1", "2.99");
     }
 }
 
 void initSerial()
 {
-    Serial.begin(115200);
+    Serial.begin(9600);
     Serial.setDebugOutput(true);
+}
+
+//Registers the board into the server.
+void checkIn()
+{
+    std::map<std::string, std::string> payload = {
+        {"id", "botlleFiller"},
+        {"name", "Filler"},
+        {"actuator", "valve"},
+        {"ip", "192.168.3.116"},
+        {"status", "off"}
+    };
+
+    Debug::printf("Initializing Board");
+
+    socket.send("board:register", payload);
+    
 }
 

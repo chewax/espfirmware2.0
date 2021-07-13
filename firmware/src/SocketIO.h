@@ -13,6 +13,7 @@
 #include <map>
 #include <functional>
 #include "Debug.h"
+#include <string>
 
 typedef std::function<void(JsonObject)> IOEventListener;
 typedef std::map<std::string, std::vector<IOEventListener>> TEventListeners;
@@ -26,6 +27,7 @@ private:
   void onDisconnect();
   void onConnect(uint8_t *payload);
   void onEvent(uint8_t *payload);
+  void onError(uint8_t *payload);
   std::string board_id;
 
 public:
@@ -36,6 +38,7 @@ public:
   void on(const std::string &event, IOEventListener listener);
   // void emit(const DynamicJsonDocument &doc);
   void quickSend(const std::string &event, const std::string& data_key, const std::string& data_value) const;
+  void send(const std::string &event, const std::map<std::string, std::string>& payload) const;
 };
 
 SocketIO::SocketIO()
@@ -44,14 +47,16 @@ SocketIO::SocketIO()
 
 void SocketIO::init(const std::string &t_board_id)
 {
+  Debug::printf("[SocketIO] Initializing\n");
   board_id = t_board_id;
-  webSocket.begin("192.168.2.111", 3000);
+  webSocket.begin("192.168.3.106", 3000, "/socket.io/?EIO=4");
   webSocket.onEvent(std::bind(&SocketIO::IOEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 // Adds a listener to a specific event
 void SocketIO::on(const std::string &event, IOEventListener listener)
 {
+  Debug::printf("[SocketIO] Add Listener on%s\n", event.c_str());
   eventListeners[event].push_back(listener);
 }
 
@@ -90,21 +95,47 @@ void SocketIO::onDisconnect()
   for (const auto &it:handlers) it(root);
 }
 
+
+// Calls all listeners for onDisconnect event
+void SocketIO::onError(uint8_t *payload)
+{
+  JsonObject root; // allocate the void JsonDocument
+  Debug::printf("[SocketIO] ERROR: %s\n", payload);
+
+  std::vector<IOEventListener> handlers = eventListeners["error"];
+  for (const auto &it:handlers) it(root);
+}
+
+//Sends a socket event with infinite amount of attributes. Cannot send nested objects
+void SocketIO::send(const std::string &event, const std::map<std::string, std::string> &payload) const
+{
+  // creat JSON message for Socket.IO (event)
+  const size_t capacity = JSON_ARRAY_SIZE(2) + 2*JSON_OBJECT_SIZE(payload.size());
+  DynamicJsonDocument doc(capacity);
+
+  doc.add(event.c_str()); //Add event name
+  
+  JsonObject doc_1 = doc.createNestedObject();
+
+  for (const auto& it : payload) {
+    doc_1[it.first] = it.second;
+  }
+
+  std::string json;
+  serializeJson(doc, json);
+  serializeJson(doc, Serial);
+
+  webSocket.sendEVENT(json.c_str());
+}
+
 // void SocketIO::emit(const DynamicJsonDocument &doc)
 void SocketIO::quickSend(const std::string &event, const std::string& data_key, const std::string& data_value) const
 {
-  std::string json = "[ \""+ event +"\", \{ \""+ data_key +"\": \""+ data_value +"\" \} ]";
-  Debug::printf("%s\n", json);
-  // std::sprintf(json, "[ \"%s\", \{ \"%s\": \"%s\" \} ]", event.c_str(), data_key.c_str(), data_value.c_str());
-  // const char* json = "[\"readings\",{\"sender\":\"dani-tes\",\"reading1\":\"2,33\"}]";
-  webSocket.sendEVENT(json.c_str());
-
-  // Print JSON for debugging
-  // Debug::printf("%s\n", output.c_str());
-  // Debug::printf("%s\n", json);
+  std::map<std::string, std::string> payload = {{data_key,data_value}};
+  send(event, payload);
 }
 
-void SocketIO::loop()∂
+void SocketIO::loop()
 {
   webSocket.loop();
 }
@@ -119,6 +150,9 @@ void SocketIO::IOEvent(socketIOmessageType_t type, uint8_t * payload, size_t len
             break;
         case sIOtype_EVENT:
             onEvent(payload);
+            break;
+        case sIOtype_ERROR:
+            onError(payload);
             break;
     }
 }
