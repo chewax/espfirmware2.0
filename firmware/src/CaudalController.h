@@ -25,6 +25,7 @@ class CaudalController: public Controller
     uint64_t lastSense = millis();
     uint64_t senseInterval = 1000;
     float conversionFactor=7.5; //para convertir de frecuencia a caudal    
+    float volume;
 };
 
 volatile int CaudalController::flow_frequency = 0;
@@ -32,6 +33,7 @@ volatile int CaudalController::flow_frequency = 0;
 void CaudalController::loop()
 {
   uint64_t now = millis();
+
   if(now - lastSense > senseInterval) {
       lastSense = now;
       sense();
@@ -49,12 +51,14 @@ void CaudalController::sense()
   float lpm=CaudalController::flow_frequency/conversionFactor; //calculamos el caudal en L/m
   float lph=lpm*60; //calculamos el caudal en L/h
   CaudalController::flow_frequency = 0; // Reset Counter
+  volume = volume + (lph/3600);
   
   std::map<std::string, std::string> payload;
   payload["id"] = id;
   payload["type"] = "caudal";
   payload["lpm"] = std::to_string(lpm).substr(0,6);
   payload["lph"] = std::to_string(lph).substr(0,6);
+  payload["vol"] = std::to_string(volume).substr(0,6);
 
   socket -> send("board:data", payload);
 }

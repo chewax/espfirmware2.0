@@ -19,8 +19,8 @@ SocketIO socket;
 // Interface toggle;
 // Interface luzFondo;
 // Interface riegoCantero;
-// Interface temp;
 
+// Interface temp;
 Interface relay;
 Interface caudal;
 
@@ -49,9 +49,8 @@ void setup()
     // toggle.init(&socket, D3, "Fill 2L", "toggle");
     // luzFondo.init(&socket, D2, "Luz Fondo", "bulb");
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
+    
     // temp.init(&socket, D4, "Temp", "dht");
-
-     //(Interrupcion 0(Pin2),funcion,Flanco de subida)
     caudal.init(&socket, D2, "Caudal", "caudal");
     relay.init(&socket, D3, "Button", "switch");
 
@@ -66,8 +65,8 @@ void loop()
     network.loop();
 
     caudal.loop();
-    // toggle.loop();
     // temp.loop();
+    // toggle.loop();
 }
 
 void initSerial()
