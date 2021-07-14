@@ -1,5 +1,5 @@
 /*
-  CaudalController.h - Library for handling YF-S201 measurements
+  FillController.h - Library for using YF-S201 for measuring specific amounts of liquids
   Created by Daniel Waksman, July, 14, 2021.
   Released into the public domain.
 */

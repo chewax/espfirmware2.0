@@ -1,3 +1,10 @@
+/*
+  Controller.h - Base class for all the subsequent controllers
+  Each controller class is a driver for a specific sensor/behaviour
+  Created by Daniel Waksman, July, 14, 2021.
+  Released into the public domain.
+*/
+
 #include <Arduino.h>
 #include <string>
 #include "SocketIO.h"

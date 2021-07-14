@@ -1,3 +1,10 @@
+/*
+  SwitchController.h - Library for handling on/of pin behaviour
+  Created by Daniel Waksman, July, 14, 2021.
+  Released into the public domain.
+*/
+
+
 #include <Arduino.h>
 #include "SocketIO.h"
 #include "Controller.h"

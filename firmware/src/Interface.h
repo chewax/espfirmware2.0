@@ -1,5 +1,5 @@
 /*
-  Board.h - Library for handling ESP8266 Board (Relay/DHT)
+  Interface.h - Library for handling ESP8266 Board (Relay/DHT)
   Created by Daniel Waksman, August 17, 2018.
   Released into the public domain.
 */
@@ -58,6 +58,5 @@ void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_n
   else if (t_actuator == "toggle") {
     ifController = new ToggleController();
     ((ToggleController*)ifController)->init(t_socket, t_pin, t_name, t_actuator, 2000);
-  }
-  
+  } 
 }

@@ -16,13 +16,13 @@
 Network network;
 SocketIO socket;
 
-// Interface toggle;
 // Interface luzFondo;
 // Interface riegoCantero;
 
 // Interface temp;
-Interface relay;
+// Interface relay;
 Interface caudal;
+Interface toggle;
 
 #define D4 2
 #define D3 0
@@ -46,13 +46,13 @@ void setup()
 
     network.quickConnect("Eolio_2G", "7Chandrian");
 
-    // toggle.init(&socket, D3, "Fill 2L", "toggle");
     // luzFondo.init(&socket, D2, "Luz Fondo", "bulb");
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
     
     // temp.init(&socket, D4, "Temp", "dht");
     caudal.init(&socket, D2, "Caudal", "caudal");
-    relay.init(&socket, D3, "Button", "switch");
+    toggle.init(&socket, D3, "Fill 2L", "toggle");
+    // relay.init(&socket, D3, "Button", "switch");
 
     socket.init("amazing-possum");
 }
@@ -65,8 +65,8 @@ void loop()
     network.loop();
 
     caudal.loop();
+    toggle.loop();
     // temp.loop();
-    // toggle.loop();
 }
 
 void initSerial()

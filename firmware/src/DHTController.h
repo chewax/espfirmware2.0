@@ -1,3 +1,9 @@
+/*
+  DHTController.h - Library for handling DH11 dht measurements
+  Created by Daniel Waksman, July, 14, 2021.
+  Released into the public domain.
+*/
+
 #include <Arduino.h>
 #include "SocketIO.h"
 #include "DHT.h"
