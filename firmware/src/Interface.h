@@ -11,6 +11,7 @@
 #include "DHTController.h"
 #include "SwitchController.h"
 #include "ToggleController.h"
+#include "CaudalController.h"
 
 #ifndef __Interface_h
 #define __Interface_h
@@ -25,8 +26,8 @@ class Interface
     ~Interface();
   
   private:
-    SocketIO* socket;
     Controller* ifController;
+    SocketIO* socket;
 };
 
 Interface::Interface(){}
@@ -45,8 +46,12 @@ void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_n
   if (t_actuator == "dht") {
     ifController = new DHTController();
     ifController->init(t_socket, t_pin, t_name, t_actuator);
+  } 
+  else if (t_actuator == "caudal") {
+    ifController = new CaudalController();
+    ifController->init(t_socket, t_pin, t_name, t_actuator);
   }
-  else if (t_actuator == "valve") {
+  else if (t_actuator == "valve" || t_actuator == "bulb" || t_actuator == "switch") {
     ifController = new SwitchController();
     ifController->init(t_socket, t_pin, t_name, t_actuator);
   }
@@ -54,6 +59,5 @@ void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_n
     ifController = new ToggleController();
     ((ToggleController*)ifController)->init(t_socket, t_pin, t_name, t_actuator, 2000);
   }
-  
   
 }

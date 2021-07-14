@@ -123,7 +123,6 @@ void SocketIO::send(const std::string &event, const std::map<std::string, std::s
 
   std::string json;
   serializeJson(doc, json);
-  serializeJson(doc, Serial);
 
   webSocket.sendEVENT(json.c_str());
 }

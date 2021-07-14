@@ -40,7 +40,7 @@ void Controller::init(SocketIO* t_socket, const int t_pin, const std::string& t_
   mac = WiFi.macAddress().c_str();
   actuator = t_actuator;
   name = t_name;
-  id =  pin + "@" + mac;
+  id =  std::to_string(pin) + "@" + mac;
 
   socket->on("connect", [this](JsonObject data){
       Debug::printf("[SOCKETIO] onConnect Callback\n");

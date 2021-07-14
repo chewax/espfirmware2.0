@@ -9,16 +9,26 @@
 #include "src/Network.h"
 #include "src/SocketIO.h"
 #include "src/Interface.h"
+#include "src/CaudalController.h"
 #include <map>
 #include <string>
 
 Network network;
 SocketIO socket;
-Interface filler;
-Interface temp;
+
+// Interface toggle;
+// Interface luzFondo;
+// Interface riegoCantero;
+// Interface temp;
+
+Interface relay;
+Interface caudal;
 
 #define D4 2
 #define D3 0
+
+#define D2 4
+#define D1 5
 
 
 // the setup function runs once when you press reset or power the board
@@ -36,10 +46,16 @@ void setup()
 
     network.quickConnect("Eolio_2G", "7Chandrian");
 
-    filler.init(&socket, D3, "Fill", "valve");
-    temp.init(&socket, D4, "Temp", "dht");
+    // toggle.init(&socket, D3, "Fill 2L", "toggle");
+    // luzFondo.init(&socket, D2, "Luz Fondo", "bulb");
+    // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
+    // temp.init(&socket, D4, "Temp", "dht");
 
-    socket.init("dani-test");
+     //(Interrupcion 0(Pin2),funcion,Flanco de subida)
+    caudal.init(&socket, D2, "Caudal", "caudal");
+    relay.init(&socket, D3, "Button", "switch");
+
+    socket.init("amazing-possum");
 }
 
 uint64_t messageTimestamp = millis();
@@ -48,8 +64,10 @@ void loop()
 {
     socket.loop();
     network.loop();
-    filler.loop();
-    temp.loop();
+
+    caudal.loop();
+    // toggle.loop();
+    // temp.loop();
 }
 
 void initSerial()
