@@ -48,12 +48,16 @@ void setup()
 
     // luzFondo.init(&socket, D2, "Luz Fondo", "bulb");
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
-    
     // temp.init(&socket, D4, "Temp", "dht");
-    caudal.init(&socket, D2, "Caudal", "caudal");
-    toggle.init(&socket, D3, "Fill 2L", "toggle");
-    // relay.init(&socket, D3, "Button", "switch");
+    
+    toggle.init(&socket, D3, "1.5L", "toggle");
+    ((ToggleController*)(toggle.ifController))->closeWhen("fill:complete");
 
+    caudal.init(&socket, D2, "Caudal", "filler");
+    ((FillController*)(caudal.ifController))->setMililiters(1500);
+    ((FillController*)(caudal.ifController))->fillWhen("toggle:" + toggle.ifController->id + ":on");
+    
+    // relay.init(&socket, D3, "Button", "switch");
     socket.init("amazing-possum");
 }
 

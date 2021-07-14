@@ -12,6 +12,7 @@
 #include "SwitchController.h"
 #include "ToggleController.h"
 #include "CaudalController.h"
+#include "FillController.h"
 
 #ifndef __Interface_h
 #define __Interface_h
@@ -25,8 +26,9 @@ class Interface
     void loop();
     ~Interface();
   
-  private:
     Controller* ifController;
+
+  private:
     SocketIO* socket;
 };
 
@@ -43,20 +45,11 @@ void Interface::loop()
 
 void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
-  if (t_actuator == "dht") {
-    ifController = new DHTController();
-    ifController->init(t_socket, t_pin, t_name, t_actuator);
-  } 
-  else if (t_actuator == "caudal") {
-    ifController = new CaudalController();
-    ifController->init(t_socket, t_pin, t_name, t_actuator);
-  }
-  else if (t_actuator == "valve" || t_actuator == "bulb" || t_actuator == "switch") {
-    ifController = new SwitchController();
-    ifController->init(t_socket, t_pin, t_name, t_actuator);
-  }
-  else if (t_actuator == "toggle") {
-    ifController = new ToggleController();
-    ((ToggleController*)ifController)->init(t_socket, t_pin, t_name, t_actuator, 2000);
-  } 
+  if (t_actuator == "dht") ifController = new DHTController();
+  else if (t_actuator == "caudal") ifController = new CaudalController();
+  else if (t_actuator == "filler") ifController = new FillController();
+  else if (t_actuator == "valve" || t_actuator == "bulb" || t_actuator == "switch") ifController = new SwitchController();
+  else if (t_actuator == "toggle") ifController = new ToggleController();
+
+  ifController->init(t_socket, t_pin, t_name, t_actuator);
 }

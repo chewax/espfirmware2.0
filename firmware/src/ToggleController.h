@@ -4,21 +4,24 @@
   Released into the public domain.
 */
 
+#ifndef __ToggleController_h
+#define __ToggleController_h
+
 #include <Arduino.h>
 #include "SocketIO.h"
 #include "Controller.h"
 #include <map>
 #include <string>
-
-#ifndef __ToggleController_h
-#define __ToggleController_h
+#include "EventEmitter.h"
 
 class ToggleController: public Controller
 {
   public:
     ToggleController():Controller(){};
-    void init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator, const int& t_timeout_ms);
+    void init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator);
     void loop();
+    void closeWhen(const uint64_t& timeout);
+    void closeWhen(const std::string& event);
 
   private:
     bool open = false;
@@ -30,10 +33,20 @@ class ToggleController: public Controller
 
 void ToggleController::loop()
 {
-  if (open) {
+  if (open && timeout_ms > 0) {
     uint64_t now = millis();
     if(now - startTime > timeout_ms) close();
   }
+}
+
+void ToggleController::closeWhen(const uint64_t& timeout)
+{
+  timeout_ms = timeout;
+}
+
+void ToggleController::closeWhen(const std::string& event)
+{
+  EventEmitter::on(event, [this](){ this->close(); });
 }
 
 void ToggleController::close()
@@ -49,19 +62,25 @@ void ToggleController::close()
   socket -> send("board:data", payload);
 }
 
-void ToggleController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator, const int& t_timeout_ms)
+
+
+void ToggleController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
   Controller::init(t_socket, t_pin, t_name, t_actuator);
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
-  timeout_ms = t_timeout_ms;
 
   socket->on("board:on", [this](JsonObject data){
     digitalWrite(this->pin, HIGH);
     this->startTime = millis();
     this->open = true;
+    std::string evt = "toggle:"+ this->id +":on";
+    EventEmitter::emit(evt);
   });
 
+  socket->on("board:off", [this](JsonObject data){
+    this->close();
+  });
 }
 
 

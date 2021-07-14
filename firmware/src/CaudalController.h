@@ -6,7 +6,6 @@
 
 #include <Arduino.h>
 #include "SocketIO.h"
-#include "DHT.h"
 #include "Controller.h"
 #include <map>
 #include <string>
@@ -21,13 +20,12 @@ class CaudalController: public Controller
 
     void init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator);
     void loop();
-    void sense();
+    virtual void sense();
 
     static void flow();
     static volatile int flow_frequency; //variable para la cantidad de pulsos recibidos
 
-  private:
-    DHT* dht;
+  protected:
     uint64_t lastSense = millis();
     uint64_t senseInterval = 1000;
     float conversionFactor=7.5; //para convertir de frecuencia a caudal    
