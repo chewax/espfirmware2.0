@@ -42,7 +42,6 @@ void CaudalController::loop()
 
 void IRAM_ATTR CaudalController::flow ()
 { 
-  Debug::printf("Interrupt=%d", CaudalController::flow_frequency);
   CaudalController::flow_frequency++;  //increment flow pulse
 } 
 
