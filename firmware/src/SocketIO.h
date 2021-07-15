@@ -18,7 +18,6 @@
 typedef std::function<void(JsonObject)> IOEventListener;
 typedef std::map<std::string, std::vector<IOEventListener>> TEventListeners;
 
-
 class SocketIO
 {
 private:
@@ -32,24 +31,26 @@ private:
 
 public:
   SocketIO();
-  void init(const std::string &t_board_id);
+  void init(const std::string &t_board_id, const char* t_host, u_int16_t t_port);
   void IOEvent(socketIOmessageType_t type, uint8_t *payload, size_t length);
   void loop();
   void on(const std::string &event, IOEventListener listener);
-  // void emit(const DynamicJsonDocument &doc);
   void quickSend(const std::string &event, const std::string& data_key, const std::string& data_value) const;
   void send(const std::string &event, const std::map<std::string, std::string>& payload) const;
+
+private:
+  char* host;
+  u_int16_t port;
 };
 
-SocketIO::SocketIO()
-{
-}
+SocketIO::SocketIO() {}
 
-void SocketIO::init(const std::string &t_board_id)
+
+void SocketIO::init(const std::string &t_board_id, const char* t_host, u_int16_t t_port)
 {
   Debug::printf("[SocketIO] Initializing\n");
   board_id = t_board_id;
-  webSocket.begin("192.168.3.106", 3000, "/socket.io/?EIO=4");
+  webSocket.begin(t_host, t_port, "/socket.io/?EIO=4");
   webSocket.onEvent(std::bind(&SocketIO::IOEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
