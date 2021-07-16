@@ -65,6 +65,7 @@ void ToggleController::close()
 {
   isOn = false;
   digitalWrite(pin, LOW);
+  this->sense();
 }
 
 
