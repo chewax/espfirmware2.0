@@ -33,12 +33,12 @@
 Network network;
 SocketIO socket;
 
-Interface luzFondo;
-Interface temp;
+// Interface luzFondo;
+// Interface temp;
 // Interface riegoCantero;
 // Interface relay;
-// Interface caudal;
-// Interface toggle;
+Interface caudal;
+Interface toggle;
 
 
 // the setup function runs once when you press reset or power the board
@@ -57,18 +57,18 @@ void setup()
     network.quickConnect(Wifi_SSID, Wifi_PASS);
 
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
-    temp.init(&socket, D4, "Temp", "dht");
-    luzFondo.init(&socket, D3, "Luz Fondo", "bulb");
+    // temp.init(&socket, D4, "Temp", "dht");
+    // luzFondo.init(&socket, D3, "Luz Fondo", "bulb");
 
 
     // TOGGLE USAGE EXAMPLE
-    // toggle.init(&socket, D3, "1.5L", "toggle");
-    // ((ToggleController*)(toggle.ifController))->closeWhen("fill:complete");
+    toggle.init(&socket, D3, "1.5L", "toggle");
+    ((ToggleController*)(toggle.ifController))->closeWhen("fill:complete");
 
     //FILLER USAGE EXAMPLE
-    // caudal.init(&socket, D2, "Caudal", "filler");
-    // ((FillController*)(caudal.ifController))->setMililiters(1500);
-    // ((FillController*)(caudal.ifController))->fillWhen("toggle:" + toggle.ifController->id + ":on");
+    caudal.init(&socket, D2, "Caudal", "filler");
+    ((FillController*)(caudal.ifController))->setMililiters(1500);
+    ((FillController*)(caudal.ifController))->fillWhen("toggle:" + toggle.ifController->id + ":on");
     
     // relay.init(&socket, D3, "Button", "switch");
     socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);
@@ -81,9 +81,9 @@ void loop()
     socket.loop();
     network.loop();
 
-    // caudal.loop();
-    // toggle.loop();
-    temp.loop();
+    caudal.loop();
+    toggle.loop();
+    // temp.loop();
 }
 
 void initSerial()

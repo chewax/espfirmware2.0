@@ -52,6 +52,7 @@ void Controller::init(SocketIO* t_socket, const int t_pin, const std::string& t_
   socket->on("connect", [this](JsonObject data){
       Debug::printf("[SOCKETIO] onConnect Callback\n");
       this->checkIn();
+      this->sense();
   });
 }
 
