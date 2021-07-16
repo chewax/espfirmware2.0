@@ -22,18 +22,30 @@ class ToggleController: public Controller
     void loop();
     void closeWhen(const uint64_t& timeout);
     void closeWhen(const std::string& event);
+    void sense();
 
   private:
-    bool open = false;
+    bool isOn = false;
     uint64_t timeout_ms = 0;
     uint64_t startTime = millis();
     void close();
     
 };
 
+void ToggleController::sense() 
+{
+  std::map<std::string, std::string> payload;
+  payload["id"] = id;
+  payload["type"] = "switch";
+  payload["state"] = isOn ? "on" : "off";
+
+  socket -> send("board:data", payload);
+}
+
+
 void ToggleController::loop()
 {
-  if (open && timeout_ms > 0) {
+  if (isOn && timeout_ms > 0) {
     uint64_t now = millis();
     if(now - startTime > timeout_ms) close();
   }
@@ -51,15 +63,8 @@ void ToggleController::closeWhen(const std::string& event)
 
 void ToggleController::close()
 {
-  open = false;
+  isOn = false;
   digitalWrite(pin, LOW);
-
-  std::map<std::string, std::string> payload;
-  payload["id"] = id;
-  payload["type"] = "switch";
-  payload["state"] = "off";
-
-  socket -> send("board:data", payload);
 }
 
 
@@ -73,9 +78,10 @@ void ToggleController::init(SocketIO* t_socket, const int t_pin, const std::stri
   socket->on("board:on", [this](JsonObject data){
     digitalWrite(this->pin, HIGH);
     this->startTime = millis();
-    this->open = true;
+    this->isOn = true;
     std::string evt = "toggle:"+ this->id +":on";
     EventEmitter::emit(evt);
+    this->sense();
   });
 
   socket->on("board:off", [this](JsonObject data){

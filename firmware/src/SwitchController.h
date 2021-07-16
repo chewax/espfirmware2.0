@@ -19,8 +19,21 @@ class SwitchController: public Controller
   public:
     SwitchController():Controller(){};
     void init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator);
+    void sense();
+
+  private:
+    bool isOn;
 };
 
+void SwitchController::sense() 
+{
+  std::map<std::string, std::string> payload;
+  payload["id"] = id;
+  payload["type"] = "switch";
+  payload["state"] = isOn ? "on" : "off";
+
+  socket -> send("board:data", payload);
+}
 
 void SwitchController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
@@ -30,10 +43,14 @@ void SwitchController::init(SocketIO* t_socket, const int t_pin, const std::stri
 
   socket->on("board:on", [this](JsonObject data){
     digitalWrite(this->pin, HIGH);
+    this->isOn = true;
+    this->sense();
   });
 
   socket->on("board:off", [this](JsonObject data){
     digitalWrite(this->pin, LOW);
+    this->isOn = false;
+    this->sense();
   });
 }
 
