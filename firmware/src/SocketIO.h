@@ -28,9 +28,10 @@ private:
   void onEvent(uint8_t *payload);
   void onError(uint8_t *payload);
   std::string board_id;
+  std::string scene;
 
 public:
-  SocketIO();
+  SocketIO(std::string t_scene);
   void init(const std::string &t_board_id, const char* t_host, u_int16_t t_port);
   void IOEvent(socketIOmessageType_t type, uint8_t *payload, size_t length);
   void loop();
@@ -43,7 +44,7 @@ private:
   u_int16_t port;
 };
 
-SocketIO::SocketIO() {}
+SocketIO::SocketIO(std::string t_scene):scene(t_scene) {}
 
 
 void SocketIO::init(const std::string &t_board_id, const char* t_host, u_int16_t t_port)
@@ -111,7 +112,10 @@ void SocketIO::onError(uint8_t *payload)
 void SocketIO::send(const std::string &event, const std::map<std::string, std::string> &payload) const
 {
   // creat JSON message for Socket.IO (event)
-  const size_t capacity = JSON_ARRAY_SIZE(2) + 2*JSON_OBJECT_SIZE(payload.size());
+  //There is one array with 2 elements [event, payload ==> JSON_ARRAY_SIZE(2)
+  //payload has payload.size + 1 elements ==> 2*JSON_OBJECT_SIZE(payload.size()+1) 
+  //(1 being scene info appended afterwards)
+  const size_t capacity = JSON_ARRAY_SIZE(2) + 2*JSON_OBJECT_SIZE(payload.size()+1);
   DynamicJsonDocument doc(capacity);
 
   doc.add(event.c_str()); //Add event name
@@ -121,6 +125,8 @@ void SocketIO::send(const std::string &event, const std::map<std::string, std::s
   for (const auto& it : payload) {
     doc_1[it.first] = it.second;
   }
+
+  doc_1["scene"] = scene;
 
   std::string json;
   serializeJson(doc, json);

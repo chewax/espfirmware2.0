@@ -26,12 +26,16 @@
 #define Wifi_PASS "7Chandrian"
 
 //SocketIO Configuration
-#define IOBoard_ID "amazing-possum"
+#define IOBoard_ID "impossible-burger"
 #define IOServer_HOST "192.168.3.105"
 #define IOServer_Port 3000
 
+//Scene name to let know the frontend how to group all boards.
+//All boards from the same scene will be put together in different views
+#define SCENE "Casita"
+
 Network network;
-SocketIO socket;
+SocketIO socket(SCENE); 
 
 // Interface luzFondo;
 // Interface temp;
@@ -61,16 +65,15 @@ void setup()
     // luzFondo.init(&socket, D3, "Luz Fondo", "bulb");
 
 
-    // TOGGLE USAGE EXAMPLE
+    // TOGGLE & FILLER USAGE EXAMPLE
     toggle.init(&socket, D3, "1.5L", "toggle");
-    ((ToggleController*)(toggle.ifController))->closeWhen("fill:complete");
-
-    //FILLER USAGE EXAMPLE
     caudal.init(&socket, D2, "Caudal", "filler");
+
     ((FillController*)(caudal.ifController))->setMililiters(1500);
     ((FillController*)(caudal.ifController))->fillWhen("toggle:" + toggle.ifController->id + ":on");
+    ((ToggleController*)(toggle.ifController))->closeWhen("fill:"+ caudal.ifController->id + ":complete");
     
-    // relay.init(&socket, D3, "Button", "switch");
+    // relay.init(&socket, D3, "Button", "bulb");
     socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);
 }
 

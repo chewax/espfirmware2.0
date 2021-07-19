@@ -50,7 +50,8 @@ void FillController::sense()
 
   if (filling && (volume*1000) >= ml) {
     filling = false;
-    EventEmitter::emit("fill:complete");
+    std::string evt = "fill:"+ this->id +":complete";
+    EventEmitter::emit(evt);
   }
 }
 
