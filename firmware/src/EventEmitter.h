@@ -34,9 +34,13 @@ void EventEmitter::on(const std::string& event, const EventListener& listener)
 void EventEmitter::emit(const std::string& event)
 {
   Debug::printf("[EventEmitter] %s\n",event.c_str());
-  std::vector<EventListener> handlers = EventEmitter::suscribers[event];
-  for (const auto &it:handlers) it();
 
+  auto s_it = EventEmitter::suscribers.find(event);
+
+  if (s_it != EventEmitter::suscribers.end()) {
+    // std::vector<EventListener> handlers = s_it->second;
+    for (const auto &h_it:s_it->second) h_it();
+  }
 }
 
 #endif

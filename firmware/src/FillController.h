@@ -12,7 +12,6 @@
 #include "CaudalController.h"
 #include <map>
 #include <string>
-#include "EventEmitter.h"
 
 
 class FillController: public CaudalController
@@ -29,30 +28,28 @@ class FillController: public CaudalController
     int ml;
     bool filling = false;
     void fill();
+    void off();
+    void on();
 };
 
 
-void FillController::fill()
-{ 
+void FillController::off()
+{
+  filling = false;
+  CaudalController::off();
+}
+
+void FillController::on()
+{
   filling = true;
   volume = 0;
+  CaudalController::on();
 }
-
-void FillController::fillWhen(const std::string& event)
-{
-  EventEmitter::on(event, [this](){ this->fill(); });
-}
-
 
 void FillController::sense()
 { 
   CaudalController::sense();
-
-  if (filling && (volume*1000) >= ml) {
-    filling = false;
-    std::string evt = "fill:"+ this->id +":complete";
-    EventEmitter::emit(evt);
-  }
+  if (filling && (volume*1000) >= ml) off();
 }
 
 void FillController::setMililiters(int t_ml)
@@ -63,6 +60,7 @@ void FillController::setMililiters(int t_ml)
 void FillController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
   CaudalController::init(t_socket, t_pin, t_name, t_actuator);
+  broadcastEvents = true;
 }
 
 

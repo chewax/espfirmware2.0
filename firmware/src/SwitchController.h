@@ -21,8 +21,10 @@ class SwitchController: public Controller
     void init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator);
     void sense();
 
-  private:
+  protected:
     bool isOn;
+    void off();
+    void on();
 };
 
 void SwitchController::sense() 
@@ -35,6 +37,22 @@ void SwitchController::sense()
   socket -> send("board:data", payload);
 }
 
+void SwitchController::off()
+{
+  digitalWrite(pin, LOW);
+  isOn = false;
+  this->sense(); //senses the current data and passes to server to update UI
+  Controller::off();
+}
+
+void SwitchController::on()
+{
+  digitalWrite(pin, HIGH);
+  isOn = true;
+  this->sense(); //senses the current data and passes to server to update UI
+  Controller::on();
+}
+
 void SwitchController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
   Controller::init(t_socket, t_pin, t_name, t_actuator);
@@ -42,15 +60,11 @@ void SwitchController::init(SocketIO* t_socket, const int t_pin, const std::stri
   digitalWrite(pin, LOW);
 
   socket->on("board:on", [this](JsonObject data){
-    digitalWrite(this->pin, HIGH);
-    this->isOn = true;
-    this->sense();
+    this->on();
   });
 
   socket->on("board:off", [this](JsonObject data){
-    digitalWrite(this->pin, LOW);
-    this->isOn = false;
-    this->sense();
+    this->off();
   });
 }
 

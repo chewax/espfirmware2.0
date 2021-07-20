@@ -69,6 +69,7 @@ void CaudalController::sense()
 void CaudalController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
   Controller::init(t_socket, t_pin, t_name, t_actuator);
+  volume = 0;
   pinMode(pin, INPUT); 
   attachInterrupt(pin, CaudalController::flow , RISING); //(Interrupcion 0(Pin2),funcion,Flanco de subida)
   sei();

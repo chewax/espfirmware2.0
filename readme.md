@@ -79,19 +79,12 @@ SocketIO socket(SCENE);
 Interface caudal;
 Interface toggle;
 
-//TOGGLE USAGE EXAMPLE
+//FILLER w/TOGGLE USAGE EXAMPLE
 //====================
 
 //Initialize toggle normally.
 toggle.init(&socket, D3, "1.5L", "toggle");
-
-//Instruct toggle to automatically close when "fill:complete" is emitted by the EventEmitter
-((ToggleController*)(toggle.ifController))->closeWhen("fill:complete"); 
-
-//FILLER USAGE EXAMPLE
-//====================
-
-/Initialize caudal normally (but with actuator filler) (see Controllers)
+//Initialize caudal normally (but with actuator filler) (see Controllers)
 caudal.init(&socket, D2, "Caudal", "filler");
 
 //Set the filler stop condition at 1500mm
@@ -99,6 +92,9 @@ caudal.init(&socket, D2, "Caudal", "filler");
 
 //Instruct the filler to start counting when the "toggle:<toggle_controller_id>:on" is emmited by the EventEmitter. 
 ((FillController*)(caudal.ifController))->fillWhen("toggle:" + toggle.ifController->id + ":on");
+
+//Instruct toggle to automatically close when "fill:<caudal_controller_id>:complete" is emitted by the EventEmitter
+((ToggleController*)(toggle.ifController))->closeWhen("fill:" + caudal.ifController->id + ":complete"); 
 
 //"fill:complete" event is harcoded into the FillerController an will be emitted every time the fill is complete
 //"toggle:<controller_id>:on" is also harcoded into the toggle controller and will be emitted every time the toggle is set to on.

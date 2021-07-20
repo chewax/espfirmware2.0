@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include <string>
 #include "SocketIO.h"
+#include "EventEmitter.h"
 
 #ifndef __Controller_h
 #define __Controller_h
@@ -29,9 +30,26 @@ class Controller
     virtual void sense();
     void checkIn();
 
+    void broadcastOn();
+    void broadcastOff();
+
+    //Whenever the controller starts or ends an action ti will emit either the start or end event to both the EventEmitter 
+    //and the socketIO. That way all boards are informed of the actions performed by this controller.
+    //broadcasting can be disabled by calling the appropiate functions
+    std::string evt_start;
+    std::string evt_end;
+    virtual void onWhen(const std::string& event, bool remote);
+    virtual void offWhen(const std::string& event, bool remote);
+
   protected:
     SocketIO* socket;
     int pin;
+    
+    bool broadcastEvents = false;
+    virtual void on();
+    virtual void off();
+    
+
 };
 
 Controller::Controller(){}
@@ -39,6 +57,48 @@ Controller::Controller(){}
 void Controller::loop(){}
 void Controller::sense(){}
 
+//Provide a way to subordinate on to a specific event
+//This event may come either from local EventEmitter or from remote SocketIO
+void Controller::onWhen(const std::string& event, bool remote=false){
+  Debug::printf("[Controller] OnWhen=%s\n", event);
+  if (remote) socket->on(event, [this](JsonObject data){  this->on(); });
+  else EventEmitter::on(event, [this](){ this->on(); });
+}
+
+//Provide a way to subordinate off to a specific event
+//This event may come either from local EventEmitter or from remote SocketIO
+void Controller::offWhen(const std::string& event, bool remote=false){
+  if (remote) socket->on(event, [this](JsonObject data){  this->off(); });
+  else EventEmitter::on(event, [this](){ this->off(); });
+}
+
+void Controller::on(){
+  //If broadcast is enabled inform all other boards via EventEmitter and Socketio
+  if (broadcastEvents) {
+    EventEmitter::emit(this->evt_start);
+    socket->quickSend("board:broadcast", "message", this->evt_start);
+  }
+}
+
+void Controller::off(){
+  //If broadcast is enabled inform all other boards via EventEmitter and Socketio
+  if (broadcastEvents) {
+    EventEmitter::emit(this->evt_end);
+    socket->quickSend("board:broadcast", "message", this->evt_end);
+  }
+}
+
+//Turns broadcast events on
+void Controller::broadcastOn() {
+  broadcastEvents = true;
+}
+
+//Turns broadcast events off
+void Controller::broadcastOff() {
+  broadcastEvents = false;
+}
+
+//Initializes controller with all the common information
 void Controller::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
   socket = t_socket;
@@ -48,6 +108,8 @@ void Controller::init(SocketIO* t_socket, const int t_pin, const std::string& t_
   actuator = t_actuator;
   name = t_name;
   id =  std::to_string(pin) + "@" + mac;
+  evt_start = id + ":start";
+  evt_end = id + ":end";
 
   socket->on("connect", [this](JsonObject data){
       Debug::printf("[SOCKETIO] onConnect Callback\n");

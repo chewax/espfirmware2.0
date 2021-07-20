@@ -64,14 +64,13 @@ void setup()
     // temp.init(&socket, D4, "Temp", "dht");
     // luzFondo.init(&socket, D3, "Luz Fondo", "bulb");
 
-
     // TOGGLE & FILLER USAGE EXAMPLE
     toggle.init(&socket, D3, "1.5L", "toggle");
     caudal.init(&socket, D2, "Caudal", "filler");
 
     ((FillController*)(caudal.ifController))->setMililiters(1500);
-    ((FillController*)(caudal.ifController))->fillWhen("toggle:" + toggle.ifController->id + ":on");
-    ((ToggleController*)(toggle.ifController))->closeWhen("fill:"+ caudal.ifController->id + ":complete");
+    caudal.ifController->onWhen( "pepitalapistolera", true );
+    caudal.ifController->onWhen( toggle.ifController->evt_start, true );
     
     // relay.init(&socket, D3, "Button", "bulb");
     socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);

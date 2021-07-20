@@ -12,7 +12,6 @@
 #include "Controller.h"
 #include <map>
 #include <string>
-#include "EventEmitter.h"
 
 class ToggleController: public Controller
 {
@@ -28,7 +27,8 @@ class ToggleController: public Controller
     bool isOn = false;
     uint64_t timeout_ms = 0;
     uint64_t startTime = millis();
-    void close();
+    void off();
+    void on();
     
 };
 
@@ -47,7 +47,7 @@ void ToggleController::loop()
 {
   if (isOn && timeout_ms > 0) {
     uint64_t now = millis();
-    if(now - startTime > timeout_ms) close();
+    if(now - startTime > timeout_ms) off();
   }
 }
 
@@ -58,16 +58,26 @@ void ToggleController::closeWhen(const uint64_t& timeout)
 
 void ToggleController::closeWhen(const std::string& event)
 {
-  EventEmitter::on(event, [this](){ this->close(); });
+  EventEmitter::on(event, [this](){ this->off(); });
 }
 
-void ToggleController::close()
+void ToggleController::off()
 {
-  isOn = false;
   digitalWrite(pin, LOW);
-  this->sense();
+  isOn = false;
+  this->sense(); //senses the current data and passes to server to update UI
+  Controller::off();
 }
 
+
+void ToggleController::on()
+{
+  digitalWrite(pin, HIGH);
+  isOn = true;
+  this->startTime = millis();
+  this->sense(); //senses the current data and passes to server to update UI
+  Controller::on();
+}
 
 
 void ToggleController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
@@ -75,18 +85,14 @@ void ToggleController::init(SocketIO* t_socket, const int t_pin, const std::stri
   Controller::init(t_socket, t_pin, t_name, t_actuator);
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
+  broadcastEvents = true;
 
   socket->on("board:on", [this](JsonObject data){
-    digitalWrite(this->pin, HIGH);
-    this->startTime = millis();
-    this->isOn = true;
-    std::string evt = "toggle:"+ this->id +":on";
-    EventEmitter::emit(evt);
-    this->sense();
+    this->on();
   });
 
   socket->on("board:off", [this](JsonObject data){
-    this->close();
+    this->off();
   });
 }
 
