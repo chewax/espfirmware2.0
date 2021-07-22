@@ -30,6 +30,7 @@
 #define IOServer_HOST "192.168.3.105"
 #define IOServer_Port 3000
 
+
 //Scene name to let know the frontend how to group all boards.
 //All boards from the same scene will be put together in different views
 #define SCENE "Casita"
@@ -49,16 +50,7 @@ Interface luzFondo;
 void setup()
 {
     initSerial(); //Initialize serial so it can be used to print
-    
-    network.onConnect([](){
-        Debug::printf("Connect Callback\n");
-    });
-
-    network.onDisconnect([](){
-        Debug::printf("Disconnect Callback\n");
-    });
-
-    network.quickConnect(Wifi_SSID, Wifi_PASS);
+  
 
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
     // temp.init(&socket, D4, "Temp", "dht");
@@ -67,15 +59,25 @@ void setup()
     // TOGGLE & FILLER USAGE EXAMPLE
     // toggle.init(&socket, D3, "1.5L", "toggle");
     // caudal.init(&socket, D2, "Caudal", "filler");
-
     // ((FillController*)(caudal.ifController))->setMililiters(1500);
     // toggle.ifController->offWhen( caudal.ifController->evt_end );
     // caudal.ifController->onWhen( toggle.ifController->evt_start );
 
-    
-    
     // relay.init(&socket, D3, "Button", "bulb");
-    socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);
+
+    network.onConnect([](){
+        Debug::printf("[Network] Connected\n");
+        socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);
+    });
+
+    network.onDisconnect([](){
+        Debug::printf("[Network] Disconnected\n");
+    });
+    
+    // network.quickConnect(Wifi_SSID, Wifi_PASS);
+    network.init();
+
+    
 }
 
 uint64_t messageTimestamp = millis();
