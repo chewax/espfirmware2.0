@@ -20,7 +20,6 @@
 //Rest of pins
 #define D2 4
 #define D1 5
-#define D8 15
 
 
 //Network Configuration
@@ -40,7 +39,7 @@ Network network;
 SocketIO socket(SCENE); 
 
 Interface luzFondo;
-Interface localButton;
+// Interface localButton;
 // Interface temp;
 // Interface riegoCantero;
 // Interface relay;
@@ -66,10 +65,10 @@ void setup()
     
     // DIGITAL INPUT CONTROLLING A RELAY EXAMPLE;
     //=========================================================================
-    luzFondo.init(&socket, D3, "Luz Fondo", "bulb");
-    localButton.init(&socket, D8, "Local Button", "digitalInput");
-    luzFondo.ifController->toggleWhen( localButton.ifController->evt_end );
-    luzFondo.ifController->toggleWhen( localButton.ifController->evt_start );
+    luzFondo.init(&socket, D3, "Shed", "bulb");
+    // localButton.init(&socket, D2, "Local Button", "digitalInput");
+    luzFondo.ifController->onWhen( "bulb:shed:on", true );
+    luzFondo.ifController->offWhen( "bulb:shed:off", true );
     //=========================================================================
 
 
@@ -86,7 +85,7 @@ void setup()
     // OTHER EXAMPLES
     //=========================================================================
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
-    // temp.init(&socket, D4, "Temp", "dht");
+    // temp.init(&socket, D4, "Shed", "dht");
     // relay.init(&socket, D3, "Button", "bulb");
     //=========================================================================
 
@@ -103,8 +102,8 @@ void loop()
     // caudal.loop();
     // toggle.loop();
     // temp.loop();
-    localButton.loop();
-    luzFondo.loop();
+    // localButton.loop();
+    // luzFondo.loop();
 }
 
 void initSerial()
