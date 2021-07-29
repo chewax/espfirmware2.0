@@ -44,7 +44,8 @@ void InputController::init(SocketIO* t_socket, const int t_pin, const std::strin
 {
   // Controller::init(t_socket, t_pin, t_name, t_actuator);
   // Override controller.init and dont call...we dont need to check in this element
-  
+  ip = WiFi.localIP().toString().c_str();
+  mac = WiFi.macAddress().c_str();
   socket = t_socket;
   pin = t_pin;
   actuator = t_actuator;
