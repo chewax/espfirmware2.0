@@ -21,13 +21,14 @@
 #define D2 4
 #define D1 5
 
+
 //Network Configuration
 #define Wifi_SSID "Eolio_2G"
 #define Wifi_PASS "7Chandrian"
 
 //SocketIO Configuration
 #define IOBoard_ID "impossible-burger"
-#define IOServer_HOST "192.168.3.105"
+#define IOServer_HOST "192.168.3.195"
 #define IOServer_Port 3000
 
 
@@ -39,6 +40,7 @@ Network network;
 SocketIO socket(SCENE); 
 
 Interface luzFondo;
+// Interface localButton;
 // Interface temp;
 // Interface riegoCantero;
 // Interface relay;
@@ -50,20 +52,7 @@ Interface luzFondo;
 void setup()
 {
     initSerial(); //Initialize serial so it can be used to print
-  
 
-    // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
-    // temp.init(&socket, D4, "Temp", "dht");
-    luzFondo.init(&socket, D3, "Luz Fondo", "bulb");
-
-    // TOGGLE & FILLER USAGE EXAMPLE
-    // toggle.init(&socket, D3, "1.5L", "toggle");
-    // caudal.init(&socket, D2, "Caudal", "filler");
-    // ((FillController*)(caudal.ifController))->setMililiters(1500);
-    // toggle.ifController->offWhen( caudal.ifController->evt_end );
-    // caudal.ifController->onWhen( toggle.ifController->evt_start );
-
-    // relay.init(&socket, D3, "Button", "bulb");
 
     network.onConnect([](){
         Debug::printf("[Network] Connected\n");
@@ -76,8 +65,35 @@ void setup()
     
     // network.quickConnect(Wifi_SSID, Wifi_PASS);
     network.init();
-
     
+    
+    // DIGITAL INPUT CONTROLLING A RELAY EXAMPLE;
+    //=========================================================================
+    luzFondo.init(&socket, D3, "Shed", "bulb");
+    // localButton.init(&socket, D2, "Local Button", "digitalInput");
+    luzFondo.ifController->onWhen( "bulb:shed:on", true );
+    luzFondo.ifController->offWhen( "bulb:shed:off", true );
+    //=========================================================================
+
+
+    // TOGGLE & FILLER USAGE EXAMPLE
+    //=========================================================================
+    // toggle.init(&socket, D3, "1.5L", "toggle");
+    // caudal.init(&socket, D2, "Caudal", "filler");
+    // ((FillController*)(caudal.ifController))->setMililiters(1500);
+    // toggle.ifController->offWhen( caudal.ifController->evt_end );
+    // caudal.ifController->onWhen( toggle.ifController->evt_start );
+    //=========================================================================
+
+    // relay.init(&socket, D3, "Button", "bulb");
+
+    // OTHER EXAMPLES
+    //=========================================================================
+    // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
+    // temp.init(&socket, D4, "Shed", "dht");
+    // relay.init(&socket, D3, "Button", "bulb");
+    //=========================================================================
+
 }
 
 uint64_t messageTimestamp = millis();
@@ -90,6 +106,8 @@ void loop()
     // caudal.loop();
     // toggle.loop();
     // temp.loop();
+    // localButton.loop();
+    // luzFondo.loop();
 }
 
 void initSerial()

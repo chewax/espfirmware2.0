@@ -13,6 +13,7 @@
 #include "ToggleController.h"
 #include "CaudalController.h"
 #include "FillController.h"
+#include "InputController.h"
 
 #ifndef __Interface_h
 #define __Interface_h
@@ -50,6 +51,7 @@ void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_n
   else if (t_actuator == "filler") ifController = new FillController();
   else if (t_actuator == "valve" || t_actuator == "bulb" || t_actuator == "switch") ifController = new SwitchController();
   else if (t_actuator == "toggle") ifController = new ToggleController();
+  else if (t_actuator == "digitalInput") ifController = new InputController();
 
   ifController->init(t_socket, t_pin, t_name, t_actuator);
 }

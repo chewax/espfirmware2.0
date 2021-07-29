@@ -25,6 +25,7 @@ class SwitchController: public Controller
     bool isOn;
     void off();
     void on();
+    void toggle();
 };
 
 void SwitchController::sense() 
@@ -35,6 +36,12 @@ void SwitchController::sense()
   payload["state"] = isOn ? "on" : "off";
 
   socket -> send("board:data", payload);
+}
+
+void SwitchController::toggle()
+{
+  if (isOn) off();
+  else on();
 }
 
 void SwitchController::off()
@@ -56,6 +63,7 @@ void SwitchController::on()
 void SwitchController::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
   Controller::init(t_socket, t_pin, t_name, t_actuator);
+
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
 

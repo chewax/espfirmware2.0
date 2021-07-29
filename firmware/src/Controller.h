@@ -40,6 +40,7 @@ class Controller
     std::string evt_end;
     virtual void onWhen(const std::string& event, bool remote);
     virtual void offWhen(const std::string& event, bool remote);
+    virtual void toggleWhen(const std::string& event, bool remote);
 
   protected:
     SocketIO* socket;
@@ -48,6 +49,7 @@ class Controller
     bool broadcastEvents = false;
     virtual void on();
     virtual void off();
+    virtual void toggle();
     
 
 };
@@ -60,7 +62,6 @@ void Controller::sense(){}
 //Provide a way to subordinate on to a specific event
 //This event may come either from local EventEmitter or from remote SocketIO
 void Controller::onWhen(const std::string& event, bool remote=false){
-  Debug::printf("[Controller] OnWhen=%s\n", event);
   if (remote) socket->on(event, [this](JsonObject data){  this->on(); });
   else EventEmitter::on(event, [this](){ this->on(); });
 }
@@ -70,6 +71,13 @@ void Controller::onWhen(const std::string& event, bool remote=false){
 void Controller::offWhen(const std::string& event, bool remote=false){
   if (remote) socket->on(event, [this](JsonObject data){  this->off(); });
   else EventEmitter::on(event, [this](){ this->off(); });
+}
+
+//Provide a way to subordinate off to a specific event
+//This event may come either from local EventEmitter or from remote SocketIO
+void Controller::toggleWhen(const std::string& event, bool remote=false){
+  if (remote) socket->on(event, [this](JsonObject data){  this->toggle(); });
+  else EventEmitter::on(event, [this](){ this->toggle(); });
 }
 
 void Controller::on(){
@@ -87,6 +95,8 @@ void Controller::off(){
     socket->quickSend("board:broadcast", "message", this->evt_end);
   }
 }
+
+void Controller::toggle(){}
 
 //Turns broadcast events on
 void Controller::broadcastOn() {
