@@ -53,7 +53,6 @@ void setup()
 {
     initSerial(); //Initialize serial so it can be used to print
 
-
     network.onConnect([](){
         Debug::printf("[Network] Connected\n");
         socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);
@@ -65,7 +64,7 @@ void setup()
     
     // network.quickConnect(Wifi_SSID, Wifi_PASS);
     network.init();
-    
+
     
     // DIGITAL INPUT CONTROLLING A RELAY EXAMPLE;
     //=========================================================================

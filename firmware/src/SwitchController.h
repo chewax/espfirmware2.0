@@ -3,6 +3,8 @@
   Created by Daniel Waksman, July, 14, 2021.
   Released into the public domain.
 */
+#ifndef __SwitchController_h
+#define __SwitchController_h
 
 
 #include <Arduino.h>
@@ -11,8 +13,6 @@
 #include <map>
 #include <string>
 
-#ifndef __SwitchController_h
-#define __SwitchController_h
 
 class SwitchController: public Controller
 {

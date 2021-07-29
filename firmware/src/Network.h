@@ -10,6 +10,7 @@
 #include "Utils.h"
 #include <DNSServer.h>
 #include "HTTPServer.h"
+#include "OTA.h"
 
 using OnStatusDelegate = std::function<void()>;
 
@@ -34,6 +35,7 @@ private:
   ConfigStruct config;
   DNSServer dnsServer;
   HTTPServer* httpServer;
+  OTA* ota;
 
 public:
   Network();
@@ -55,6 +57,7 @@ Network::Network()
 
 Network::~Network(){
   delete httpServer;
+  delete ota;
 }
 
 //Initializes network from EEPROM configuration.
@@ -62,9 +65,16 @@ Network::~Network(){
 void Network::init(){
   config = Utils::loadConfig();
   
-  if (strlen(config.ssid) > 0) quickConnect(config.ssid, config.password);
-  else startAP();
+  if (strlen(config.ssid) > 0) {
+    quickConnect(config.ssid, config.password);
+    ota = new OTA(config.name);
+  }
+  else {
+    startAP();
+    ota = new OTA("ESP@" + (*WiFi.macAddress().c_str()));
+  }
 
+  ota -> init();
   httpServer = new HTTPServer(80);
   httpServer->init();
 }
@@ -149,7 +159,8 @@ void Network::loop()
 { 
   dnsServer.processNextRequest();
   httpServer->loop();
-
+  ota->loop();
+  
   if (millis() < lastLoop + 1000) return; //Accept loop only every 1 second;
   lastLoop = millis();
 
