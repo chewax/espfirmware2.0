@@ -51,8 +51,8 @@ void InputController::init(SocketIO* t_socket, const int t_pin, const std::strin
   actuator = t_actuator;
   name = t_name;
   id =  std::to_string(pin) + "@" + mac;
-  evt_start = id + ":start";
-  evt_end = id + ":end";
+  evt_on = id + ":on";
+  evt_off = id + ":off";
 
   pinMode(pin, INPUT);
   lastReading = LOW;

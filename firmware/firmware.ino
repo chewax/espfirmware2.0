@@ -78,8 +78,8 @@ void setup()
     // caudal.init(&socket, D2, "Caudal", "filler");
 
     // ((FillController*)(caudal.ifController))->setMililiters(1500);
-    // toggle.ifController->offWhen( caudal.ifController->evt_end );
-    // caudal.ifController->onWhen( toggle.ifController->evt_start );
+    // toggle.ifController->offWhen( caudal.ifController->evt_off );
+    // caudal.ifController->onWhen( toggle.ifController->evt_on );
     //=========================================================================
 
     // OTHER EXAMPLES

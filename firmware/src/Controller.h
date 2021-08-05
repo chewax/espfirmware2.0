@@ -36,8 +36,8 @@ class Controller
     //Whenever the controller starts or ends an action ti will emit either the start or end event to both the EventEmitter 
     //and the socketIO. That way all boards are informed of the actions performed by this controller.
     //broadcasting can be disabled by calling the appropiate functions
-    std::string evt_start;
-    std::string evt_end;
+    std::string evt_on;
+    std::string evt_off;
     virtual void onWhen(const std::string& event, bool remote);
     virtual void offWhen(const std::string& event, bool remote);
     virtual void toggleWhen(const std::string& event, bool remote);
@@ -83,16 +83,16 @@ void Controller::toggleWhen(const std::string& event, bool remote=false){
 void Controller::on(){
   //If broadcast is enabled inform all other boards via EventEmitter and Socketio
   if (broadcastEvents) {
-    EventEmitter::emit(this->evt_start);
-    socket->quickSend("board:broadcast", "message", this->evt_start);
+    EventEmitter::emit(this->evt_on);
+    socket->quickSend("board:broadcast", "message", this->evt_on);
   }
 }
 
 void Controller::off(){
   //If broadcast is enabled inform all other boards via EventEmitter and Socketio
   if (broadcastEvents) {
-    EventEmitter::emit(this->evt_end);
-    socket->quickSend("board:broadcast", "message", this->evt_end);
+    EventEmitter::emit(this->evt_off);
+    socket->quickSend("board:broadcast", "message", this->evt_off);
   }
 }
 
@@ -118,8 +118,8 @@ void Controller::init(SocketIO* t_socket, const int t_pin, const std::string& t_
   actuator = t_actuator;
   name = t_name;
   id =  std::to_string(pin) + "@" + mac;
-  evt_start = id + ":start";
-  evt_end = id + ":end";
+  evt_on = id + ":on";
+  evt_off = id + ":off";
 
   socket->on("connect", [this](JsonObject data){
       Debug::printf("[SOCKETIO] onConnect Callback\n");
