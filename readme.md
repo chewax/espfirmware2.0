@@ -1,5 +1,4 @@
 # Home Automation 8266 Firmware
-For standalone boards  
 ![License MIT](https://img.shields.io/github/license/chewax/espfirmware2.0)
 ![Issues](https://img.shields.io/github/issues/chewax/espfirmware2.0)
 ![Follow Me](https://img.shields.io/twitter/follow/chewax)
