@@ -22,13 +22,19 @@ class DHTController: public Controller
     void init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator);
     void loop();
     void sense();
+    void setSenseInterval(const uint64_t& ms);
 
   protected:
     DHT* dht;
     uint64_t lastSense = millis();
-    uint64_t senseInterval = 10000;
+    uint64_t senseInterval = 10 * 1000; //10 seconds
 };
 
+
+void DHTController::setSenseInterval(const uint64_t& ms)
+{
+  senseInterval = ms;
+}
 
 void DHTController::loop()
 {

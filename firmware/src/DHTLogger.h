@@ -26,6 +26,8 @@ class DHTLogger: public DHTController
     void checkIn();
     void sense();
     
+    
+
   protected:
     Request* request;
 };
@@ -35,6 +37,7 @@ DHTLogger::~DHTLogger()
   delete request;
   DHTController::~DHTController();
 }
+
 
 void DHTLogger::checkIn()
 {
@@ -50,8 +53,6 @@ void DHTLogger::init(SocketIO* t_socket, const int t_pin, const std::string& t_n
 
 void DHTLogger::sense()
 {
-  Debug::printf("SENSE\n");
-
   float h = dht->readHumidity();
   float t = dht->readTemperature();
   float hic = dht->computeHeatIndex(t, h, false); 
