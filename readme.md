@@ -1,6 +1,7 @@
 # Home Automation 8266 Firmware
-For standalone boards
-![License MIT](https://img.shields.io/github/license/chewax/espfirmware2.0?style=plastic)
+For standalone boards  
+![License MIT](https://img.shields.io/github/license/chewax/espfirmware2.0)
+![Issues](https://img.shields.io/github/issues/chewax/espfirmware2.0)
 
 ## Basic Behaviour
 This firmware is thought to modularize and delegate all functionality to each individual controller. As such each controller must implement three indispensable functions:
