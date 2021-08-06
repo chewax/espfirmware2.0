@@ -28,7 +28,7 @@ class Controller
     virtual void init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator);
     virtual void loop();
     virtual void sense();
-    void checkIn();
+    virtual void checkIn();
 
     void broadcastOn();
     void broadcastOff();

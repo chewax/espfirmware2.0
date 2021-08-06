@@ -14,6 +14,7 @@
 #include "CaudalController.h"
 #include "FillController.h"
 #include "InputController.h"
+#include "DHTLogger.h"
 
 #ifndef __Interface_h
 #define __Interface_h
@@ -47,6 +48,7 @@ void Interface::loop()
 void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_name, const std::string& t_actuator)
 {
   if (t_actuator == "dht") ifController = new DHTController();
+  if (t_actuator == "dhtLogger") ifController = new DHTLogger();
   else if (t_actuator == "caudal") ifController = new CaudalController();
   else if (t_actuator == "filler") ifController = new FillController();
   else if (t_actuator == "valve" || t_actuator == "bulb" || t_actuator == "switch") ifController = new SwitchController();

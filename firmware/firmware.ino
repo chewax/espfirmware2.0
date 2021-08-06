@@ -45,6 +45,7 @@ Interface luzFondo;
 // Interface relay;
 // Interface caudal;
 // Interface toggle;
+Interface dhtLogger;
 
 
 // the setup function runs once when you press reset or power the board
@@ -67,8 +68,8 @@ void setup()
     //=========================================================================
     luzFondo.init(&socket, D3, "Shed", "bulb");
     // localButton.init(&socket, D2, "Local Button", "digitalInput");
-    luzFondo.ifController->onWhen( "bulb:shed:on", true );
-    luzFondo.ifController->offWhen( "bulb:shed:off", true );
+    // luzFondo.ifController->onWhen( "bulb:shed:on", true );
+    // luzFondo.ifController->offWhen( "bulb:shed:off", true );
     //=========================================================================
 
 
@@ -87,6 +88,7 @@ void setup()
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
     // temp.init(&socket, D4, "Shed", "dht");
     // relay.init(&socket, D3, "Button", "bulb");
+    dhtLogger.init(&socket, D4, "Temp Logger Office", "dhtLogger");
     //=========================================================================
 
     socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);
@@ -104,6 +106,8 @@ void loop()
     // temp.loop();
     // localButton.loop();
     // luzFondo.loop();
+
+    dhtLogger.loop();
 }
 
 void initSerial()
