@@ -10,6 +10,7 @@
 #include "Controller.h"
 #include "DHTController.h"
 #include "SwitchController.h"
+#include "SwitchTimerController.h"
 #include "ToggleController.h"
 #include "CaudalController.h"
 #include "FillController.h"
@@ -52,6 +53,7 @@ void Interface::init(SocketIO* t_socket, const int t_pin, const std::string& t_n
   else if (t_actuator == "caudal") ifController = new CaudalController();
   else if (t_actuator == "filler") ifController = new FillController();
   else if (t_actuator == "valve" || t_actuator == "bulb" || t_actuator == "switch") ifController = new SwitchController();
+  else if (t_actuator == "timerSwitch") ifController = new SwitchTimerController();
   else if (t_actuator == "toggle") ifController = new ToggleController();
   else if (t_actuator == "digitalInput") ifController = new InputController();
 

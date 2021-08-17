@@ -10,6 +10,7 @@
 #include "src/SocketIO.h"
 #include "src/Interface.h"
 #include "src/CaudalController.h"
+#include "src/SwitchTimerController.h"
 #include <map>
 #include <string>
 
@@ -27,8 +28,8 @@
 #define Wifi_PASS "7Chandrian"
 
 //SocketIO Configuration
-#define IOBoard_ID "impossible-burger"
-#define IOServer_HOST "192.168.3.195"
+#define IOBoard_ID "mitocondrial-outburst"
+#define IOServer_HOST "192.168.3.106"
 #define IOServer_Port 3000
 
 //Scene name to let know the frontend how to group all boards.
@@ -38,14 +39,15 @@
 Network network;
 SocketIO socket(SCENE); 
 
-Interface luzFondo;
+// Interface luzFondo;
 // Interface localButton;
 // Interface temp;
 // Interface riegoCantero;
 // Interface relay;
+Interface relayTimer;
 // Interface caudal;
 // Interface toggle;
-Interface dhtLogger;
+// Interface dhtLogger;
 
 
 // the setup function runs once when you press reset or power the board
@@ -66,7 +68,7 @@ void setup()
     
     // DIGITAL INPUT CONTROLLING A RELAY EXAMPLE;
     //=========================================================================
-    luzFondo.init(&socket, D3, "Shed", "bulb");
+    // luzFondo.init(&socket, D3, "Shed", "bulb");
     // localButton.init(&socket, D2, "Local Button", "digitalInput");
     // luzFondo.ifController->onWhen( "bulb:shed:on", true );
     // luzFondo.ifController->offWhen( "bulb:shed:off", true );
@@ -86,9 +88,13 @@ void setup()
     // OTHER EXAMPLES
     //=========================================================================
     // riegoCantero.init(&socket, D1, "Riego Cantero", "valve");
-    // temp.init(&socket, D4, "Shed", "dht");
-    // relay.init(&socket, D3, "Button", "bulb");
-    dhtLogger.init(&socket, D4, "Temp Logger Office", "dhtLogger");
+    // temp.init(&socket, D4, "Afuera", "dht");
+    // relay.init(&socket, D4, "Button", "bulb");
+    relayTimer.init(&socket, D4, "Calefon", "timerSwitch");
+    uint64_t onTime = (19 * 60 * 60) + (1 * 60); //19:01
+    uint64_t offTime = (19 * 60 * 60) + (2 * 60); //19:02
+    ((SwitchTimerController*)(relayTimer.ifController))->setOnOfftime(onTime, offTime);
+    // dhtLogger.init(&socket, D4, "Temp Logger Office", "dhtLogger");
     //=========================================================================
 
     socket.init(IOBoard_ID, IOServer_HOST, IOServer_Port);
@@ -106,8 +112,8 @@ void loop()
     // temp.loop();
     // localButton.loop();
     // luzFondo.loop();
-
-    dhtLogger.loop();
+    // dhtLogger.loop();
+    relayTimer.loop();
 }
 
 void initSerial()
